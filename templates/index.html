@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Onz Dev Studios - Voice Assistant</title>
+    <style>
+        :root {
+            --bg-color: #FFFFFF;
+            --secondary-bg: #F8FAFC;
+            --accent: #3B82F6;
+            --text: #1E293B;
+            --secondary-text: #64748B;
+            --button-bg: #3B82F6;
+            --button-hover: #2563EB;
+            --button-fg: #FFFFFF;
+            --border: #E2E8F0;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: var(--bg-color);
+            color: var(--text);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1.5fr;
+            gap: 20px;
+        }
+
+        .wave-container {
+            background: var(--secondary-bg);
+            border-radius: 8px;
+            padding: 20px;
+            border: 1px solid var(--border);
+        }
+
+        #waveform {
+            width: 100%;
+            height: 150px;
+            background: var(--secondary-bg);
+        }
+
+        .record-btn {
+            background: var(--button-bg);
+            color: var(--button-fg);
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .record-btn:hover {
+            background: var(--button-hover);
+        }
+
+        .transcript {
+            background: var(--secondary-bg);
+            border-radius: 8px;
+            padding: 20px;
+            border: 1px solid var(--border);
+            height: 500px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="left-panel">
+            <h1>
+                <img src="/static/logo.png" alt="Onz Dev Studios" height="50">
+                Voice Assistant
+            </h1>
+            
+            <div class="wave-container">
+                <h3>Voice Activity</h3>
+                <canvas id="waveform"></canvas>
+            </div>
+
+            <button id="recordButton" class="record-btn">▶️ Start</button>
+        </div>
+
+        <div class="right-panel">
+            <div class="transcript" id="transcript"></div>
+        </div>
+    </div>
+
+    <script>
+        // Waveform animation
+        const canvas = document.getElementById('waveform');
+        const ctx = canvas.getContext('2d');
+        let animationId = null;
+        let isRecording = false;
+
+        function setupCanvas() {
+            canvas.width = canvas.offsetWidth;
+            canvas.height = canvas.offsetHeight;
+        }
+
+        function drawWave() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const centerY = canvas.height / 2;
+            const barWidth = 4;
+            const gap = 3;
+            const numBars = canvas.width / (barWidth + gap);
+
+            ctx.fillStyle = '#3B82F6';
+
+            for (let i = 0; i < numBars; i++) {
+                const x = i * (barWidth + gap);
+                const height = isRecording ? Math.random() * 40 + 5 : 4;
+                ctx.fillRect(x, centerY - height/2, barWidth, height);
+            }
+
+            if (isRecording) {
+                animationId = requestAnimationFrame(drawWave);
+            }
+        }
+
+        // Record button functionality
+        const recordButton = document.getElementById('recordButton');
+        recordButton.addEventListener('click', () => {
+            isRecording = !isRecording;
+            recordButton.textContent = isRecording ? '⏸️ Pause' : '▶️ Start';
+            
+            if (isRecording) {
+                drawWave();
+            } else {
+                cancelAnimationFrame(animationId);
+            }
+        });
+
+        // Initial setup
+        window.addEventListener('resize', setupCanvas);
+        setupCanvas();
+        drawWave();
+    </script>
+</body>
+</html> 
